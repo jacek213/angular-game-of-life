@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html ng-app="gameOfLife">
+  <head>
+<!--     <link rel="stylesheet" type="text/css" href="bootstrap.min.css" /> -->
+    <script type="text/javascript" src="angular.min.js"></script>
+    <script type="text/javascript" src="app.js"></script>
+    <link rel="stylesheet" type="text/css" href="app.css">
+  </head>
+
+
+  <body ng-controller="GameController as game">
+
+    <h1>Game of life!</h1>
+
+
+    <table>
+      <thead>
+        <th>
+        </th>
+      </thead>
+      <tbody>
+        <tr ng-repeat="row in game.matrix track by $index">
+          <td ng-repeat="item in row track by $index" ng-class="{'active': item===1}" ng-click="game.toggleItem($parent.$index, $index)">
+          <!-- {{item}} -->
+          </td>
+        </tr>
+
+      </tbody>
+
+    </table>
+
+    <button id="go" ng-click="game.run()">go</button>
+    <button ng-click="game.randomize()">randomize</button>
+
+  </body>
+</html>

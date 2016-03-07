@@ -1,0 +1,11 @@
+table td {
+    width: 20px;
+    height: 20px;
+    text-align: center;
+    vertical-align: middle;
+    border: solid 1px #ddd;
+}
+
+table td.active {
+  background: red;
+}
