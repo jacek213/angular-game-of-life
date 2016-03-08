@@ -1,7 +1,7 @@
 (function() {
   var app = angular.module('gameOfLife', []);
 
-  app.controller("GameController", function(){
+  app.controller("GameController", ['$scope', '$interval', function($scope, $interval){
 
     this.matrix = [
       [1,0,0,1,0,1,1,0,0,1,0,1],
@@ -18,8 +18,36 @@
       [0,0,1,0,0,0,0,1,0,0,0,0],
     ];
 
-    this.matrixWidth = 12;
-    this.matrixHeight = 12;
+    // this.matrixWidth = 12;
+    // this.matrixHeight = 12;
+
+    $scope.size = 20;
+
+    var ctrl = this;
+
+    $scope.$watch("size", function(){
+
+      console.log($scope.size);
+
+      var newMatrix = [];
+
+      var row;
+
+      for (var i = 0; i < $scope.size; i++) {
+        row = [];
+
+        for (var u = 0; u < $scope.size; u++) {
+          row.push(Math.round(Math.random()));
+        }
+
+        newMatrix.push(row);
+
+      }
+
+      ctrl.matrix = newMatrix;
+
+    });
+
 
     this.randomize = function() {
       this._mapItems(function(){
@@ -41,8 +69,8 @@
     };
 
     this.inRange = function(rowIdx, colIdx) {
-      return rowIdx <= (this.matrixHeight - 1) && rowIdx > 0 &&
-             colIdx <= (this.matrixWidth - 1)  && colIdx > 0;
+      return rowIdx <= ($scope.size - 1) && rowIdx > 0 &&
+             colIdx <= ($scope.size - 1)  && colIdx > 0;
     }
 
     this.countSiblings = function(rowIdx, colIdx) {
@@ -62,9 +90,12 @@
 
     this.run = function() {
       var that = this;
-      this._mapItems(function(item, siblings){
-        return that._applyRules(item, siblings);
-      });
+
+      $interval(function() {
+        that._mapItems(function(item, siblings){
+          return that._applyRules(item, siblings);
+        });
+      }, 20);
     };
 
     this._mapItems = function(callback) {
@@ -98,5 +129,5 @@
         }
       }
     };
-  });
+  }]);
 })();

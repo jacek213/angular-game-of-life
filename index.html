@@ -12,6 +12,11 @@
 
     <h1>Game of life!</h1>
 
+    <button id="go" ng-click="game.run()">go</button>
+    <button ng-click="game.randomize()">randomize</button>
+    <input type="range" min="3" max="100" value="10" ng-model="size">
+
+
 
     <table>
       <thead>
@@ -29,8 +34,6 @@
 
     </table>
 
-    <button id="go" ng-click="game.run()">go</button>
-    <button ng-click="game.randomize()">randomize</button>
 
   </body>
 </html>
