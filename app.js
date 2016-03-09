@@ -3,50 +3,61 @@
 
   app.controller("GameController", ['$interval', function($interval){
 
-    var ctrl = this;
-    var gameInterval;
+    var gameInterval,
+        ctrl = this;
 
-    this.size = 20;
-    this.matrix = [];
+    var init = function() {
+      ctrl.width = 20;
+      ctrl.height = 20;
+      ctrl.updateSize();
+    };
+
+    this.step = function() {
+      ctrl._mapItems(function(item, siblings){
+        return ctrl._applyRules(item, siblings);
+      });
+    }
 
     this.start = function() {
       if ( angular.isDefined(gameInterval) ) return;
 
-      gameInterval = $interval(function() {
-        ctrl._mapItems(function(item, siblings){
-          return ctrl._applyRules(item, siblings);
-        });
-      }, 20);
-    }
+      gameInterval = $interval(ctrl.step, 20);
+    };
 
     this.stop = function() {
       if (angular.isDefined(gameInterval)) {
         $interval.cancel(gameInterval);
         gameInterval = undefined;
       }
-    }
+    };
 
-    this.updateSize = function(newSize) {
-      this.stop();
-      var newMatrix = [];
-      var row;
-      for (var i = 0; i < newSize; i++) {
+    this.updateSize = function() {
+      var row,
+          temp = [];
+
+      ctrl.stop();
+
+      for (var i = 0; i < ctrl.height; i++) {
         row = [];
-
-        for (var u = 0; u < newSize; u++) {
+        for (var ii = 0; ii < ctrl.width; ii++) {
           row.push(Math.round(Math.random()));
         }
-        newMatrix.push(row);
+        temp.push(row);
       }
-      this.matrix = newMatrix;
-    }
-
-    this.updateSize(this.size);
+      ctrl.matrix = temp;
+    };
 
     this.randomize = function() {
       this.stop();
       this._mapItems(function() {
         return Math.round(Math.random());
+      });
+    };
+
+    this.clear = function() {
+      this.stop();
+      this._mapItems(function() {
+        return 0;
       });
     };
 
@@ -63,8 +74,8 @@
     };
 
     this._inRange = function(rowIdx, colIdx) {
-      return rowIdx <= (this.size - 1) && rowIdx > 0 &&
-             colIdx <= (this.size - 1)  && colIdx > 0;
+      return rowIdx <= (this.height - 1) && rowIdx > 0 &&
+             colIdx <= (this.width - 1)  && colIdx > 0;
     }
 
     this._countSiblings = function(rowIdx, colIdx) {
@@ -93,19 +104,13 @@
 
     this._applyRules = function(item, siblingsCount) {
       if (item === 0) {
-        if (siblingsCount === 3) {
-          return 1;
-        } else {
-          return 0;
-        }
-
-      } else if (item === 1) {
-        if (siblingsCount === 2 || siblingsCount === 3) {
-          return 1;
-        } else {
-          return 0;
-        }
+        return (siblingsCount === 3) ? 1 : 0;
+      } else {
+        return (siblingsCount === 2 || siblingsCount === 3) ? 1 : 0;
       }
     };
+
+    init();
+
   }]);
 })();
