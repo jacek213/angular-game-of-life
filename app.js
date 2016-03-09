@@ -1,29 +1,12 @@
 (function() {
   var app = angular.module('gameOfLife', []);
 
-  app.controller("GameController", ['$scope', '$interval', function($scope, $interval){
+  app.controller("GameController", ['$interval', function($interval){
 
     var ctrl = this;
     var gameInterval;
 
-    $scope.size = 20;
-
-    $scope.$watch("size", function() {
-      ctrl.stop();
-      var newMatrix = [];
-      var row;
-      for (var i = 0; i < $scope.size; i++) {
-        row = [];
-
-        for (var u = 0; u < $scope.size; u++) {
-          row.push(Math.round(Math.random()));
-        }
-        newMatrix.push(row);
-      }
-      ctrl.matrix = newMatrix;
-    });
-
-
+    this.size = 20;
     this.matrix = [];
 
     this.start = function() {
@@ -43,6 +26,23 @@
       }
     }
 
+    this.updateSize = function(newSize) {
+      this.stop();
+      var newMatrix = [];
+      var row;
+      for (var i = 0; i < newSize; i++) {
+        row = [];
+
+        for (var u = 0; u < newSize; u++) {
+          row.push(Math.round(Math.random()));
+        }
+        newMatrix.push(row);
+      }
+      this.matrix = newMatrix;
+    }
+
+    this.updateSize(this.size);
+
     this.randomize = function() {
       this.stop();
       this._mapItems(function() {
@@ -54,45 +54,39 @@
       this.matrix[rowIdx][colIdx] = (this.matrix[rowIdx][colIdx] === 0) ? 1 : 0;
     };
 
-    this.getItemValue = function(rowIdx, colIdx) {
-      if (this.inRange(rowIdx, colIdx)) {
+    this._getItemValue = function(rowIdx, colIdx) {
+      if (this._inRange(rowIdx, colIdx)) {
         return this.matrix[rowIdx][colIdx];
       } else {
         return 0;
       }
     };
 
-    this.inRange = function(rowIdx, colIdx) {
-      return rowIdx <= ($scope.size - 1) && rowIdx > 0 &&
-             colIdx <= ($scope.size - 1)  && colIdx > 0;
+    this._inRange = function(rowIdx, colIdx) {
+      return rowIdx <= (this.size - 1) && rowIdx > 0 &&
+             colIdx <= (this.size - 1)  && colIdx > 0;
     }
 
-    this.countSiblings = function(rowIdx, colIdx) {
+    this._countSiblings = function(rowIdx, colIdx) {
       return [
-        this.getItemValue(rowIdx-1, colIdx),
-        this.getItemValue(rowIdx-1, colIdx-1),
-        this.getItemValue(rowIdx-1, colIdx+1),
-        this.getItemValue(rowIdx+1, colIdx),
-        this.getItemValue(rowIdx+1, colIdx-1),
-        this.getItemValue(rowIdx+1, colIdx+1),
-        this.getItemValue(rowIdx, colIdx-1),
-        this.getItemValue(rowIdx, colIdx+1),
+        this._getItemValue(rowIdx-1, colIdx),
+        this._getItemValue(rowIdx-1, colIdx-1),
+        this._getItemValue(rowIdx-1, colIdx+1),
+        this._getItemValue(rowIdx+1, colIdx),
+        this._getItemValue(rowIdx+1, colIdx-1),
+        this._getItemValue(rowIdx+1, colIdx+1),
+        this._getItemValue(rowIdx, colIdx-1),
+        this._getItemValue(rowIdx, colIdx+1),
       ].reduce(function (a, b) {
         return a + b;
       });
     };
 
     this._mapItems = function(callback) {
-      var that = this;
-
       this.matrix = this.matrix.map(function(row, rowIdx){
-
         return row.map(function(item, colIdx) {
-
-          var siblings = that.countSiblings(rowIdx, colIdx);
-
+          var siblings = ctrl._countSiblings(rowIdx, colIdx);
           return callback(item, siblings, rowIdx, colIdx);
-
         });
       });
     };

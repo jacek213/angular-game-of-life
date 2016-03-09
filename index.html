@@ -16,7 +16,7 @@
     <button ng-click="game.stop()">stop</button>
 
     <button ng-click="game.randomize()">randomize</button>
-    <input type="range" min="6" max="100" value="10" ng-model="size">
+    <input type="range" min="6" max="100" value="10" ng-model="game.size" ng-change="game.updateSize(game.size)" >
 
 
 
