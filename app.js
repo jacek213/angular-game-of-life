@@ -3,57 +3,51 @@
 
   app.controller("GameController", ['$scope', '$interval', function($scope, $interval){
 
-    this.matrix = [
-      [1,0,0,1,0,1,1,0,0,1,0,1],
-      [0,1,0,0,1,0,0,1,1,1,0,1],
-      [1,0,0,1,1,0,1,0,0,1,0,0],
-      [0,0,1,0,1,0,0,1,0,1,0,0],
-      [0,1,0,0,1,0,1,0,0,1,0,0],
-      [0,0,0,0,0,0,1,0,0,1,0,1],
-      [0,1,0,0,1,0,0,1,0,1,0,1],
-      [1,0,0,1,0,1,1,0,0,1,0,1],
-      [0,0,0,0,1,0,0,1,0,1,0,0],
-      [0,1,0,0,1,0,0,1,1,1,0,1],
-      [1,0,0,1,1,0,0,0,0,1,0,0],
-      [0,0,1,0,0,0,0,1,0,0,0,0],
-    ];
-
-    // this.matrixWidth = 12;
-    // this.matrixHeight = 12;
+    var ctrl = this;
+    var gameInterval;
 
     $scope.size = 20;
 
-    var ctrl = this;
-
-    $scope.$watch("size", function(){
-
-      console.log($scope.size);
-
+    $scope.$watch("size", function() {
+      ctrl.stop();
       var newMatrix = [];
-
       var row;
-
       for (var i = 0; i < $scope.size; i++) {
         row = [];
 
         for (var u = 0; u < $scope.size; u++) {
           row.push(Math.round(Math.random()));
         }
-
         newMatrix.push(row);
-
       }
-
       ctrl.matrix = newMatrix;
-
     });
 
 
+    this.matrix = [];
+
+    this.start = function() {
+      if ( angular.isDefined(gameInterval) ) return;
+
+      gameInterval = $interval(function() {
+        ctrl._mapItems(function(item, siblings){
+          return ctrl._applyRules(item, siblings);
+        });
+      }, 20);
+    }
+
+    this.stop = function() {
+      if (angular.isDefined(gameInterval)) {
+        $interval.cancel(gameInterval);
+        gameInterval = undefined;
+      }
+    }
+
     this.randomize = function() {
-      this._mapItems(function(){
+      this.stop();
+      this._mapItems(function() {
         return Math.round(Math.random());
       });
-
     };
 
     this.toggleItem = function(rowIdx, colIdx) {
@@ -86,16 +80,6 @@
       ].reduce(function (a, b) {
         return a + b;
       });
-    };
-
-    this.run = function() {
-      var that = this;
-
-      $interval(function() {
-        that._mapItems(function(item, siblings){
-          return that._applyRules(item, siblings);
-        });
-      }, 20);
     };
 
     this._mapItems = function(callback) {
