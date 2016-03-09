@@ -66,7 +66,8 @@
     };
 
     this.toggleItem = function(rowIdx, colIdx) {
-      ctrl.matrix[rowIdx][colIdx] = (ctrl.matrix[rowIdx][colIdx] === 0) ? 1 : 0;
+      var newValue = (ctrl.matrix[rowIdx][colIdx] === 0) ? 1 : 0;
+      ctrl.matrix[rowIdx][colIdx] = newValue;
     };
 
     this._getItemValue = function(rowIdx, colIdx) {
