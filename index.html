@@ -1,17 +1,14 @@
 <!DOCTYPE html>
 <html ng-app="gameOfLife">
   <head>
-<!--     <link rel="stylesheet" type="text/css" href="bootstrap.min.css" /> -->
     <script type="text/javascript" src="angular.min.js"></script>
     <script type="text/javascript" src="app.js"></script>
     <link rel="stylesheet" type="text/css" href="app.css">
   </head>
 
-
   <body ng-controller="GameController as game">
 
     <h1>Game of life</h1>
-
 
     <div id="controls">
       <button ng-click="game.start()">start</button>
@@ -21,18 +18,21 @@
       <button ng-click="game.randomize()">randomize</button>
       <div>
         <div id="sliders">
-          <label>matrix width</label>
-          <input type="range" min="6" max="100" value="10" ng-model="game.width" ng-change="game.updateSize(game.width, game.height)" >
-        </div>
-        <div>
-          <label>matrix height</label>
-          <input type="range" min="6" max="100" value="10" ng-model="game.height" ng-change="game.updateSize()" >
+          <div class="slider-wrapper">
+            <label>matrix width<span class="current-val">{{game.width}}</span></label>
+            <input type="range" min="6" max="100" ng-model="game.width" ng-change="game.updateSize()" >
+          </div>
+          <div class="slider-wrapper">
+            <label>matrix height<span class="current-val">{{game.height}}</span></label>
+            <input type="range" min="6" max="100" ng-model="game.height" ng-change="game.updateSize()" >
+          </div>
+          <div class="slider-wrapper">
+            <label>interval<span class="current-val">{{game.interval}}ms</span></label>
+            <input type="range" min="10" max="800" ng-model="game.interval" ng-change="game.updateSpeed()" >
+          </div>
         </div>
       </div>
     </div>
-
-
-
 
     <table>
       <thead>

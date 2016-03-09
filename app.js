@@ -7,8 +7,9 @@
         ctrl = this;
 
     var init = function() {
-      ctrl.width = 20;
-      ctrl.height = 20;
+      ctrl.width = 80;
+      ctrl.height = 40;
+      ctrl.interval = 20;
       ctrl.updateSize();
     };
 
@@ -16,12 +17,11 @@
       ctrl._mapItems(function(item, siblings){
         return ctrl._applyRules(item, siblings);
       });
-    }
+    };
 
     this.start = function() {
-      if ( angular.isDefined(gameInterval) ) return;
-
-      gameInterval = $interval(ctrl.step, 20);
+      if (ctrl._isRunning()) return;
+      gameInterval = $interval(ctrl.step, ctrl.interval);
     };
 
     this.stop = function() {
@@ -31,72 +31,81 @@
       }
     };
 
-    this.updateSize = function() {
-      var row,
-          temp = [];
-
+    this.updateSpeed = function() {
+      var beenRunning = ctrl._isRunning();
       ctrl.stop();
+      if (beenRunning) ctrl.start();
+    };
+
+    this.updateSize = function() {
+      var row;
+      ctrl.stop();
+      ctrl.matrix = [];
 
       for (var i = 0; i < ctrl.height; i++) {
         row = [];
         for (var ii = 0; ii < ctrl.width; ii++) {
           row.push(Math.round(Math.random()));
         }
-        temp.push(row);
+        ctrl.matrix.push(row);
       }
-      ctrl.matrix = temp;
     };
 
     this.randomize = function() {
-      this.stop();
-      this._mapItems(function() {
+      ctrl.stop();
+      ctrl._mapItems(function() {
         return Math.round(Math.random());
       });
     };
 
     this.clear = function() {
-      this.stop();
-      this._mapItems(function() {
+      ctrl.stop();
+      ctrl._mapItems(function() {
         return 0;
       });
     };
 
     this.toggleItem = function(rowIdx, colIdx) {
-      this.matrix[rowIdx][colIdx] = (this.matrix[rowIdx][colIdx] === 0) ? 1 : 0;
+      ctrl.matrix[rowIdx][colIdx] = (ctrl.matrix[rowIdx][colIdx] === 0) ? 1 : 0;
     };
 
     this._getItemValue = function(rowIdx, colIdx) {
-      if (this._inRange(rowIdx, colIdx)) {
-        return this.matrix[rowIdx][colIdx];
+      if (ctrl._inRange(rowIdx, colIdx)) {
+        return ctrl.matrix[rowIdx][colIdx];
       } else {
         return 0;
       }
     };
 
+    this._isRunning = function() {
+      return angular.isDefined(gameInterval);
+    };
+
     this._inRange = function(rowIdx, colIdx) {
-      return rowIdx <= (this.height - 1) && rowIdx > 0 &&
-             colIdx <= (this.width - 1)  && colIdx > 0;
+      return rowIdx <= (ctrl.height - 1) && rowIdx > 0 &&
+             colIdx <= (ctrl.width - 1)  && colIdx > 0;
     }
 
     this._countSiblings = function(rowIdx, colIdx) {
       return [
-        this._getItemValue(rowIdx-1, colIdx),
-        this._getItemValue(rowIdx-1, colIdx-1),
-        this._getItemValue(rowIdx-1, colIdx+1),
-        this._getItemValue(rowIdx+1, colIdx),
-        this._getItemValue(rowIdx+1, colIdx-1),
-        this._getItemValue(rowIdx+1, colIdx+1),
-        this._getItemValue(rowIdx, colIdx-1),
-        this._getItemValue(rowIdx, colIdx+1),
+        ctrl._getItemValue(rowIdx-1, colIdx),
+        ctrl._getItemValue(rowIdx-1, colIdx-1),
+        ctrl._getItemValue(rowIdx-1, colIdx+1),
+        ctrl._getItemValue(rowIdx+1, colIdx),
+        ctrl._getItemValue(rowIdx+1, colIdx-1),
+        ctrl._getItemValue(rowIdx+1, colIdx+1),
+        ctrl._getItemValue(rowIdx, colIdx-1),
+        ctrl._getItemValue(rowIdx, colIdx+1),
       ].reduce(function (a, b) {
         return a + b;
       });
     };
 
     this._mapItems = function(callback) {
-      this.matrix = this.matrix.map(function(row, rowIdx){
+      var siblings;
+      ctrl.matrix = ctrl.matrix.map(function(row, rowIdx){
         return row.map(function(item, colIdx) {
-          var siblings = ctrl._countSiblings(rowIdx, colIdx);
+          siblings = ctrl._countSiblings(rowIdx, colIdx);
           return callback(item, siblings, rowIdx, colIdx);
         });
       });

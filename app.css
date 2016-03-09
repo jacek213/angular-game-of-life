@@ -23,4 +23,19 @@ table td.active {
 
 #sliders {
   margin-top: 10px;
+  position: relative;
+}
+
+#sliders input {
+  position: absolute;
+  right: 0;
+}
+
+.slider-wrapper {
+  margin-bottom: 7px;
+}
+
+.current-val {
+  margin-left: 5px;
+  color: red;
 }
