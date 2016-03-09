@@ -14,8 +14,8 @@
     };
 
     this.step = function() {
-      ctrl._mapItems(function(item, siblings){
-        return ctrl._applyRules(item, siblings);
+      ctrl._mapCells(function(item, siblings){
+        return ctrl._newCellState(item, siblings);
       });
     };
 
@@ -53,33 +53,33 @@
 
     this.randomize = function() {
       ctrl.stop();
-      ctrl._mapItems(function() {
+      ctrl._mapCells(function() {
         return Math.round(Math.random());
       });
     };
 
     this.clear = function() {
       ctrl.stop();
-      ctrl._mapItems(function() {
+      ctrl._mapCells(function() {
         return 0;
       });
     };
 
-    this.toggleItem = function(rowIdx, colIdx) {
-      var newValue = (ctrl.matrix[rowIdx][colIdx] === 0) ? 1 : 0;
+    this.toggleCellState = function(rowIdx, colIdx) {
+      var newValue = (ctrl._cellState(rowIdx, colIdx) === 0) ? 1 : 0;
       ctrl.matrix[rowIdx][colIdx] = newValue;
     };
 
-    this._getItemValue = function(rowIdx, colIdx) {
+    this._isRunning = function() {
+      return angular.isDefined(gameInterval);
+    };
+
+    this._cellState = function(rowIdx, colIdx) {
       if (ctrl._inRange(rowIdx, colIdx)) {
         return ctrl.matrix[rowIdx][colIdx];
       } else {
         return 0;
       }
-    };
-
-    this._isRunning = function() {
-      return angular.isDefined(gameInterval);
     };
 
     this._inRange = function(rowIdx, colIdx) {
@@ -89,20 +89,20 @@
 
     this._countSiblings = function(rowIdx, colIdx) {
       return [
-        ctrl._getItemValue(rowIdx-1, colIdx),
-        ctrl._getItemValue(rowIdx-1, colIdx-1),
-        ctrl._getItemValue(rowIdx-1, colIdx+1),
-        ctrl._getItemValue(rowIdx+1, colIdx),
-        ctrl._getItemValue(rowIdx+1, colIdx-1),
-        ctrl._getItemValue(rowIdx+1, colIdx+1),
-        ctrl._getItemValue(rowIdx, colIdx-1),
-        ctrl._getItemValue(rowIdx, colIdx+1),
+        ctrl._cellState(rowIdx-1, colIdx),
+        ctrl._cellState(rowIdx-1, colIdx-1),
+        ctrl._cellState(rowIdx-1, colIdx+1),
+        ctrl._cellState(rowIdx+1, colIdx),
+        ctrl._cellState(rowIdx+1, colIdx-1),
+        ctrl._cellState(rowIdx+1, colIdx+1),
+        ctrl._cellState(rowIdx, colIdx-1),
+        ctrl._cellState(rowIdx, colIdx+1),
       ].reduce(function (a, b) {
         return a + b;
       });
     };
 
-    this._mapItems = function(callback) {
+    this._mapCells = function(callback) {
       var siblings;
       ctrl.matrix = ctrl.matrix.map(function(row, rowIdx){
         return row.map(function(item, colIdx) {
@@ -112,8 +112,8 @@
       });
     };
 
-    this._applyRules = function(item, siblingsCount) {
-      if (item === 0) {
+    this._newCellState = function(currentState, siblingsCount) {
+      if (currentState === 0) {
         return (siblingsCount === 3) ? 1 : 0;
       } else {
         return (siblingsCount === 2 || siblingsCount === 3) ? 1 : 0;

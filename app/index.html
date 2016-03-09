@@ -5,6 +5,8 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <title>Game of life</title>
     <link rel="stylesheet" type="text/css" href="app.css">
+    <script src="bower_components/angular/angular.js"></script>
+    <script src="app.js"></script>
   </head>
 
   <body ng-controller="GameController as game">
@@ -42,13 +44,10 @@
       </thead>
       <tbody>
         <tr ng-repeat="row in game.matrix track by $index">
-          <td ng-repeat="item in row track by $index" ng-class="{'active': item===1}" ng-click="game.toggleItem($parent.$index, $index)">
+          <td ng-repeat="item in row track by $index" ng-class="{'active': item === 1}" ng-click="game.toggleCellState($parent.$index, $index)">
           </td>
         </tr>
       </tbody>
     </table>
-
-    <script src="bower_components/angular/angular.js"></script>
-    <script src="app.js"></script>
   </body>
 </html>
